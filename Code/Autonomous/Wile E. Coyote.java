@@ -15,16 +15,21 @@ import java.util.List;
 
 @TeleOp(name = "Record_Autonomous")
 public class Record_Autonomous extends LinearOpMode {
+    //List of each "Frame" of the recording | Each frame has multiple saved values that are needed to fully visualize it
     List<HashMap<String, Double>> recording;
 
+    //Variables for the recording process
     boolean isRecording = false;
     final ElapsedTime runtime = new ElapsedTime();
 
+    //Variables for the playing process
     boolean isPlaying = false;
     int iteration = 0;
-    
+
+    //Variables for motor usage
     DcMotor frontLeftMotor, backLeftMotor, frontRightMotor, backRightMotor; //Declaring variables used for motors
 
+    //I don't actually know what this is but its for directional movement
     IMU imu;
 
     @Override
@@ -54,23 +59,24 @@ public class Record_Autonomous extends LinearOpMode {
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
-
-        //Updating the user screen
+        
         telemetry.addData("Status", "Waiting to Start");
         telemetry.update();
 
         waitForStart();
-
+        
         telemetry.addData("Status", "Waiting to start recording");
         telemetry.update();
 
         if (opModeIsActive()) {
             while (opModeIsActive()) {
 
+                //Resets header or 0 direction
                 if (gamepad1.right_bumper) {
                     imu.resetYaw();
                 }
 
+                //Starts recording process
                 if (gamepad1.start) {
                     isRecording = true;
                     runtime.reset();
@@ -78,13 +84,14 @@ public class Record_Autonomous extends LinearOpMode {
                     telemetry.addData("Time until recording end", 30 - runtime.time());
                 }
 
+                //Starts playing process
                 if (gamepad1.a){
                     isPlaying = true;
                     telemetry.addData("Status", "Playing recording");
                     playRecording(recording);
                 }
 
-
+                //Records all values of robot(right now only movement) and packs it into a frame of the recording
                 if (isRecording && (30 - runtime.time()) > 0) {
                     telemetry.addData("Status", "Recording");
                     telemetry.addData("Time until recording end", 30 - runtime.time());
@@ -100,26 +107,30 @@ public class Record_Autonomous extends LinearOpMode {
                             values.get("rx"));
 
 
-                } else if ((30 - runtime.time()) <= 0 && isRecording) {
+                } 
+                //Stops recording after 30 seconds and sets up playing the recording
+                else if ((30 - runtime.time()) <= 0 && isRecording) {
                     isRecording = false;
                     telemetry.clearAll();
                     telemetry.addData("Status", "Waiting to play Recording");
                 }
 
+                //Plays a specific frame of the recording
                 if(isPlaying && iteration < recording.size()){
                     playRecording(recording);
                 }
-                
+
             }
 
             telemetry.update();
         }
     }
 
+    //Think of each frame as a collection of every input the driver makes in one moment, saved like a frame in a video is
     private void playRecording(List<HashMap<String, Double>> recording){
-        //GETTING VALUES FROM CURRENT TIME STAMP IN RECORDING
+        //Gets the correct from from the recording
         HashMap<String, Double> values = recording.get(iteration);
-
+        
         double rotY = values.getOrDefault("rotY", 0.0);
         double rotX = values.getOrDefault("rotX", 0.0);
         double rx = values.getOrDefault("rx", 0.0);
@@ -141,6 +152,7 @@ public class Record_Autonomous extends LinearOpMode {
     }
 
 
+    //Simple robot movement
     private HashMap<String, Double> robotMovement(double botHeading) {
 
         HashMap<String, Double> values = new HashMap<>();
