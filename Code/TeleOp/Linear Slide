@@ -1,0 +1,19 @@
+package org.firstinspires.ftc.teamcode;
+
+import java.util.*;
+import com.qualcomm.robotcore.hardware.DcMotor;
+//from here
+public class LinearSlide extends LinearOpMode {
+  DcMotor armExtend;
+  
+  @Override
+    public void runOpMode() {
+      armExtend = hardwareMap.get(DcMotor.class, "armExtend");
+      
+      while (runOpMode()) {
+//to here, i dont know what most of this does
+        double /*name*/ = /*the controller button/switch wanted*/;
+        armExtend.setPower(/*name*/);
+      }
+  }
+}
