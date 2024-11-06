@@ -1,1 +1,38 @@
+package org.firstinspires.ftc.teamcode;
 
+import java.util.*;
+import com.qualcomm.robotcore.hardware.DcMotor;
+
+public class LinearSlide extends LinearOpMode {
+  
+  //sets the variables
+  DcMotor armExtend;
+  DcMotor armExtendTwo;
+  
+  double power = 0.5;
+
+  
+  @Override
+    public void runOpMode() {
+      armExtend = hardwareMap.get(DcMotor.class, "armExtend");
+      armExtendTwo = hardwareMap.get(DcMotor.class, "armExtendTwo");
+      
+      waitForStart();
+      while (opModeIsAtive()) {
+        
+        //extends the arm up and down
+        if (gamepad2.dpad_up) {
+          armExtend.setPower(0.1 * power);
+          armExtendTwo.setPower(-0.1 * power);
+        } 
+        else if (gamepad2.dpad_down) {
+          armExtend.setPower(-0.1 * power);
+          armExtendTwo.setPower(0.1 * power);
+        } 
+        else {
+          armExtend.setPower(0);
+          armExtendTwo.setPower(0);
+        }
+      }
+    }
+}
